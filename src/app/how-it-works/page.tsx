@@ -1,188 +1,174 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  FileCheck,
-  FileText,
-  GraduationCap,
-  CarFront,
-  Briefcase,
-  ShieldAlert,
-  ShieldCheck,
-  Wallet,
-  Sparkles,
-  Lock
-} from "lucide-react";
+import { ArrowRight, CarFront, Check, FileCheck2, GraduationCap, ImageIcon, QrCode, ScanSearch, UserPlus, UserRound } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
+import { DisclosureCard } from "@/components/lender-disclosure";
+import { LenderName, RefundDays } from "@/components/settings-text";
 
-export const metadata = {
-  title: "How It Works | Money Pay by Rakvih",
-  description: "Understand the application process, category KYC requirements, ₹299 fee policy, and 24-48 hr review.",
+export const metadata: Metadata = {
+  title: "How it works",
+  description: "The four steps from account to decision, what documents you need, and how the refundable ₹299 fee works.",
 };
+
+const STEPS = [
+  {
+    icon: UserPlus,
+    title: "Create your account",
+    body: "Sign up with your email and a password. Your account keeps your application private and lets you come back to check your status at any time.",
+  },
+  {
+    icon: FileCheck2,
+    title: "Add your details and documents",
+    body: "Enter your name, mobile number, date of birth, address and the amount you need. Upload a government ID and an address proof. We only ask for the last four characters of your ID number, never the full number.",
+  },
+  {
+    icon: QrCode,
+    title: "Pay the ₹299 application fee",
+    body: "Scan the QR with any UPI app and pay ₹299. Check that the payee name matches what's shown on the page. Then enter the UTR from your UPI app, upload the payment screenshot, and give us a UPI ID for refunds.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Review and decision in 24–48 hours",
+    body: "Our team checks your documents and confirms the payment in our account. If approved, your application goes to the lender, who contacts you with a loan offer and Key Fact Statement. If not approved, you get a note explaining why and a full refund.",
+  },
+];
 
 export default function HowItWorksPage() {
   return (
-    <div className="max-w-[1240px] mx-auto px-6 pt-12 pb-0">
-      {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <span className="eyebrow justify-center mb-3">
-          <span /> TRANSPARENT & EASY
-        </span>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
-          How Money Pay Works
-        </h1>
-        <p className="mt-4 text-base text-slate-600 leading-relaxed">
-          Our 3-step application portal makes submitting your details, uploading required documents, and completing the ₹299 application fee fast and straightforward.
-        </p>
-      </div>
+    <main className="-mb-16">
+      <PageHeader
+        eyebrow="How it works"
+        title="From application to decision, step by step."
+        intro="Most people finish in about ten minutes. Have your ID, an address proof and a UPI app ready."
+      />
 
-      {/* 3 Steps Overview */}
-      <div className="grid md:grid-cols-3 gap-8 mb-16">
-        <div className="card p-8 border border-slate-200/90 rounded-3xl bg-white shadow-sm hover:shadow-md transition">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xl mb-6 shadow-inner">
-            01
-          </div>
-          <span className="text-xs font-bold tracking-widest text-blue-600 uppercase">Step One</span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Submit Personal & KYC Details</h2>
-          <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-            Create an applicant account or sign in. Fill in your name, contact number, residential address, requested loan amount, and select your applicant category.
-          </p>
-          <ul className="mt-5 space-y-2 text-xs text-slate-700">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> State & PIN code validation
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Last 4 digits of Identity document
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Direct category-based uploads
-            </li>
-          </ul>
+      {/* ============================ STEPS — white ============================ */}
+      <section className="theme-light">
+        <div className="shell py-14 sm:py-[4.5rem]">
+          <SectionHead eyebrow="The process" title="Four steps." accent="No surprises." />
+          <ol className="mt-9 grid gap-4 md:grid-cols-2">
+            {STEPS.map(({ icon: Icon, title, body }, i) => (
+              <li key={title} className="card group relative overflow-hidden p-6 transition duration-300 hover:-translate-y-0.5 sm:p-8">
+                <span
+                  className="display pointer-events-none absolute right-5 top-4 select-none text-[3.75rem] leading-none text-ink/[0.06] transition group-hover:text-gold/20 sm:right-7 sm:top-5 sm:text-[4.75rem]"
+                  aria-hidden
+                >
+                  0{i + 1}
+                </span>
+                <div className="relative flex items-center gap-4">
+                  <span className="grid size-11 place-items-center rounded-xl border border-gold/25 bg-gradient-to-br from-gold/20 to-gold/[0.03] text-gold">
+                    <Icon size={19} />
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-gold-ink">Step {i + 1}</span>
+                </div>
+                <h2 className="display relative mt-5 text-xl sm:text-2xl">{title}</h2>
+                <p className="relative mt-3 text-[0.95rem] leading-relaxed text-muted">{body}</p>
+              </li>
+            ))}
+          </ol>
         </div>
+      </section>
 
-        <div className="card p-8 border border-slate-200/90 rounded-3xl bg-white shadow-sm hover:shadow-md transition">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-xl mb-6 shadow-inner">
-            02
-          </div>
-          <span className="text-xs font-bold tracking-widest text-amber-600 uppercase">Step Two</span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Pay ₹299 Fee via Published UPI QR</h2>
-          <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-            Scan the official published UPI payment QR code using Google Pay, PhonePe, Paytm, or any UPI app. Pay exactly ₹299 application processing fee.
-          </p>
-          <ul className="mt-5 space-y-2 text-xs text-slate-700">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Exact ₹299 fixed fee
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Enter 6–40 char UTR reference
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Upload payment screenshot receipt
-            </li>
-          </ul>
-        </div>
-
-        <div className="card p-8 border border-slate-200/90 rounded-3xl bg-white shadow-sm hover:shadow-md transition">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xl mb-6 shadow-inner">
-            03
-          </div>
-          <span className="text-xs font-bold tracking-widest text-emerald-600 uppercase">Step Three</span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Admin Verification & Decision</h2>
-          <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-            Authorized administrators manually verify receiving account funds and inspect document authenticity. Review decisions are published to your portal within 24–48 hours.
-          </p>
-          <ul className="mt-5 space-y-2 text-xs text-slate-700">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> 24–48 hr estimated review window
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Detailed admin decision notes
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" /> Real-time status badge tracking
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Category Document Requirements */}
-      <section className="bg-white border border-slate-200/90 rounded-3xl p-8 md:p-12 mb-16 shadow-sm">
-        <div className="max-w-2xl mb-10">
-          <span className="eyebrow mb-2">DOCUMENT CHECKLIST</span>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Requirements by Applicant Category
-          </h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Please make sure all document uploads are clear, uncropped PNG, JPG, WebP or PDF files under 5 MB each.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
-              <GraduationCap size={22} />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Student Applicant</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Requires valid Student ID card, Institution Name, Identity Proof, and Address Proof.
+      {/* ========================== DOCUMENTS — blue ========================== */}
+      <section className="section-blue overflow-hidden">
+        <div className="shell grid items-center gap-10 py-14 sm:py-[4.5rem] lg:grid-cols-[.9fr_1.1fr]">
+          <div>
+            <SectionHead eyebrow="Documents" title="What you'll" accent="need." />
+            <p className="mt-4 max-w-md leading-relaxed text-ink-2">
+              Clear photos or PDFs. Every applicant needs an ID and an address proof; some categories need one more.
             </p>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {["Clear & readable", "Up to 5 MB each", "PNG · JPG · WebP · PDF"].map((t) => (
+                <li key={t} className="chip border-white/10 bg-white/[0.05] text-ink-2">
+                  <ImageIcon size={12} className="text-gold" /> {t}
+                </li>
+              ))}
+            </ul>
           </div>
-
-          <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
-              <CarFront size={22} />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Driver Applicant</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Requires Driving Licence as Identity document, plus residential Address Proof.
-            </p>
-          </div>
-
-          <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
-              <Briefcase size={22} />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Employed / Self-Employed</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Requires Government Identity proof (Voter ID, Passport, DL) and Address proof.
-            </p>
-          </div>
-
-          <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-4">
-              <Wallet size={22} />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Unemployed Applicant</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Requires standard Identity document and residential Address document for KYC review.
-            </p>
+          <div className="card divide-y divide-white/[0.07] overflow-hidden">
+            <DocRow icon={<FileCheck2 size={18} />} who="Everyone" what="Voter ID, passport or driving licence, plus a current address proof (utility bill, bank statement or rent agreement)." />
+            <DocRow icon={<GraduationCap size={18} />} who="Students" what="Your institution's name and a valid student ID card, in addition to the above." />
+            <DocRow icon={<CarFront size={18} />} who="Drivers" what="Your driving licence must be the ID document you upload." />
+            <DocRow icon={<UserRound size={18} />} who="Unemployed" what="Just KYC: your ID and a current address proof. Nothing more." />
           </div>
         </div>
       </section>
 
-      {/* Fee & Policy Notice Banner - Clean Bottom Margin */}
-      <section className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 mb-4 relative overflow-hidden shadow-lg">
-        <div className="max-w-2xl relative z-10">
-          <div className="inline-flex items-center gap-2 text-yellow-400 font-bold text-xs uppercase tracking-wider mb-4">
-            <ShieldAlert size={16} /> Important Policy & Disclosures
-          </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
-            Application Processing Fee & Assessment
-          </h2>
-          <p className="mt-4 text-sm text-slate-300 leading-relaxed">
-            The ₹299 fee is non-refundable and strictly covers manual document evaluation and administrative processing. Application acceptance confirms initial document approval; final loan terms, eligibility, and disbursement are subject to separate operator assessment.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/apply" className="btn btn-yellow text-xs font-bold px-6 py-3.5 rounded-xl shadow-md shadow-amber-500/15">
-              Go to Application Portal <ArrowRight size={16} />
-            </Link>
-            <Link href="/questions" className="px-6 py-3.5 rounded-xl border border-slate-700 text-xs font-semibold hover:border-slate-500 transition text-slate-200">
-              Read FAQs & Questions
-            </Link>
+      {/* ============================ FEE — white ============================ */}
+      <section className="theme-light">
+        <div className="shell py-14 sm:py-[4.5rem]">
+          <SectionHead eyebrow="The fee" title="₹299," accent="refundable if you're not approved." />
+          <div className="mt-9 grid items-start gap-6 lg:grid-cols-2">
+            <div className="card card-glow p-6 sm:p-8">
+              <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-muted">Application fee</p>
+              <p className="display mt-2 text-5xl">
+                <span className="text-champagne">₹299</span>
+                <span className="ml-2 text-base font-medium text-muted">once</span>
+              </p>
+              <ul className="mt-6 space-y-3.5 text-[0.95rem] leading-relaxed text-ink-2">
+                <Point>Paid once, by UPI, to the payee shown on the application page.</Point>
+                <Point>It pays for manual checks of your documents and payment. It is not interest and is not taken from your loan.</Point>
+                <Point>
+                  If your application is not approved, the full ₹299 goes back to the UPI ID you give us within <RefundDays /> days. The refund reference appears on your
+                  application.
+                </Point>
+                <Point>If we can&rsquo;t find your payment, no refund is due. Contact the grievance officer with your UTR and we&rsquo;ll look into it.</Point>
+                <Point>We will never ask you for any other payment.</Point>
+              </ul>
+            </div>
+            <div>
+              <DisclosureCard />
+              <p className="mt-5 px-1 text-[0.95rem] leading-relaxed text-muted">
+                <LenderName fallback="The lender" /> makes the credit decision, sets the interest rate and tenure, and pays out the loan. You&rsquo;ll get a Key Fact
+                Statement with the full cost before you sign anything.
+              </p>
+              <Link href="/apply" className="btn btn-gold btn-lg mt-6 w-full sm:w-auto">
+                Start your application <ArrowRight size={17} />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
+    </main>
+  );
+}
+
+function SectionHead({ eyebrow, title, accent }: { eyebrow: string; title: string; accent?: string }) {
+  return (
+    <div className="max-w-2xl">
+      <span className="eyebrow">{eyebrow}</span>
+      <h2 className="display mt-4 text-[2.1rem] leading-[1.06] sm:text-[2.9rem]">
+        <span className="text-gradient">{title}</span>
+        {accent && (
+          <>
+            {" "}
+            <span className="serif text-champagne text-[1.08em]">{accent}</span>
+          </>
+        )}
+      </h2>
+    </div>
+  );
+}
+
+function Point({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span className="mt-1 grid size-5 shrink-0 place-items-center rounded-full bg-ok-soft text-ok">
+        <Check size={12} strokeWidth={3} />
+      </span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+function DocRow({ icon, who, what }: { icon: React.ReactNode; who: string; what: string }) {
+  return (
+    <div className="flex gap-4 p-5 sm:p-6">
+      <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-white/10 bg-gradient-to-br from-brand/25 to-transparent text-brand-ink">{icon}</span>
+      <div>
+        <h3 className="font-bold text-ink">{who}</h3>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{what}</p>
+      </div>
     </div>
   );
 }

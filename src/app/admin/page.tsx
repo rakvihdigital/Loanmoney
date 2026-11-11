@@ -1,10 +1,11 @@
-import MoneyPay from "@/components/money-pay";
+import type { Metadata } from "next";
+import { AdminConsole } from "@/components/admin/admin-console";
 
-export const metadata = {
-  title: "Admin Dashboard | Money Pay",
-  description: "Administrator control center for managing payment QR settings and reviewing applicant KYC.",
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminPage() {
-  return <MoneyPay admin />;
+  return <AdminConsole />;
 }

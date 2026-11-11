@@ -1,74 +1,47 @@
-import Link from "next/link";
-import { Lock, ArrowLeft, ShieldCheck, Database, Key } from "lucide-react";
+import type { Metadata } from "next";
+import { PageHeader } from "@/components/page-header";
+import { GrievanceContact, LenderName } from "@/components/settings-text";
 
-export const metadata = {
-  title: "Privacy Policy | Money Pay by Rakvih",
-  description: "Learn how Rakvih Money Pay protects and encrypts your personal information and uploaded KYC documents.",
+export const metadata: Metadata = {
+  title: "Privacy policy",
+  description: "What we collect, why, who can see it and how to ask for it to be deleted.",
 };
 
 export default function PrivacyPage() {
   return (
-    <main className="max-w-[1000px] mx-auto px-6 py-12">
-      <div className="mb-8">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline mb-4">
-          <ArrowLeft size={14} /> Back to Home
-        </Link>
-        <span className="eyebrow mb-2"><span /> PRIVACY & SECURITY</span>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-slate-600">Last updated: October 2026 · Money Pay by Rakvih</p>
-      </div>
-
-      <div className="glass-card p-6 md:p-10 border border-slate-200/80 rounded-3xl bg-white/95 shadow-sm space-y-8 text-sm text-slate-700 leading-relaxed">
-        <section className="space-y-3">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Lock size={20} className="text-blue-600" /> 1. Information We Collect
-          </h2>
-          <p>
-            When you submit an application through <strong>Money Pay by Rakvih</strong>, we collect personal and financial verification details strictly required to process your request:
-          </p>
-          <ul className="list-disc list-inside space-y-1.5 pl-2 text-slate-600">
-            <li><strong>Personal Identifiers:</strong> Full legal name, 10-digit mobile number, date of birth, residential address, city, state, and PIN code.</li>
-            <li><strong>KYC Documents:</strong> Identity document (Voter ID, Passport, Driving Licence, or Student ID) and residential address proof.</li>
-            <li><strong>Payment Receipt Proof:</strong> UPI UTR/transaction reference number and screenshot of payment confirmation.</li>
+    <main>
+      <PageHeader eyebrow="Legal" title="Privacy policy" intro="What we collect, why we collect it, and who can see it." />
+      <section className="shell py-10">
+        <article className="prose-legal max-w-3xl">
+          <h2>What we collect</h2>
+          <ul>
+            <li><strong>Account:</strong> your email address and a password (stored hashed by our authentication provider).</li>
+            <li><strong>Application:</strong> name, mobile number, date of birth, address, category, amount requested and, for students, your institution.</li>
+            <li><strong>Documents:</strong> images or PDFs of your ID, address proof and student ID. For your ID number we keep only the last four characters as text.</li>
+            <li><strong>Payment:</strong> the UTR, your payment screenshot and the UPI ID you give us for refunds.</li>
           </ul>
-        </section>
 
-        <section className="space-y-3 pt-6 border-t border-slate-200/80">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Database size={20} className="text-blue-600" /> 2. How We Store & Protect Data
-          </h2>
-          <p>
-            All submitted identity and address documents are stored in private, encrypted cloud storage buckets. We enforce zero-trust access control protocols:
-          </p>
-          <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs text-blue-900 font-medium space-y-2">
-            <p>🔒 <strong>Private Buckets:</strong> Document files are not publicly accessible on the web.</p>
-            <p>⏳ <strong>Short-Lived Signed URLs:</strong> When an administrator reviews your file, a temporary signed URL is generated that automatically expires after 5 minutes.</p>
-          </div>
-        </section>
+          <h2>Why we collect it</h2>
+          <p>To verify your identity, address and payment; to make a decision on your application; to refund you if you&rsquo;re not approved; and to pass approved applications to the lender.</p>
 
-        <section className="space-y-3 pt-6 border-t border-slate-200/80">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Key size={20} className="text-blue-600" /> 3. Data Usage & Disclosure
-          </h2>
-          <p>
-            We do not sell, rent, or trade your personal information or uploaded KYC documents to third parties for marketing purposes. Data is used exclusively by authorized administrators for evaluating your application status.
-          </p>
-        </section>
+          <h2>Who can see it</h2>
+          <ul>
+            <li>You, when signed in to your account.</li>
+            <li>Our authorised reviewers. Documents are stored in private storage, and reviewer links expire after five minutes.</li>
+            <li><LenderName fallback="The lending partner" />, for applications that are approved, so it can assess and offer a loan.</li>
+          </ul>
+          <p>We don&rsquo;t sell your data or share it for marketing.</p>
 
-        <section className="space-y-3 pt-6 border-t border-slate-200/80">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <ShieldCheck size={20} className="text-blue-600" /> 4. Applicant Rights & Inquiries
-          </h2>
-          <p>
-            You have the right to request clarification or deletion of your submitted records after application evaluation completes. For privacy inquiries, please contact the Money Pay support team.
-          </p>
-        </section>
+          <h2>Consent</h2>
+          <p>We record when you give consent to the document review. You can withdraw consent before a decision is made by contacting us; your application will then be closed.</p>
 
-        <section className="pt-6 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Money Pay by Rakvih. All rights reserved.</p>
-          <Link href="/terms" className="text-blue-600 font-bold hover:underline">Read Terms and Conditions →</Link>
-        </section>
-      </div>
+          <h2>How long we keep it</h2>
+          <p>We keep application records and documents for as long as required by law and our lender&rsquo;s record-keeping obligations, then delete them.</p>
+
+          <h2>Your rights</h2>
+          <p>You can ask for a copy of your data, a correction, or deletion where the law allows. Contact <GrievanceContact />.</p>
+        </article>
+      </section>
     </main>
   );
 }

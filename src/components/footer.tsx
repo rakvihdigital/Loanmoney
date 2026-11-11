@@ -1,159 +1,133 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Wallet, ShieldCheck, Lock, Clock, Mail, CheckCircle2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Mail, Phone, ShieldCheck } from "lucide-react";
+import { Logo } from "./ui";
+import { useSettings } from "@/lib/settings-context";
+import { FEE } from "@/lib/types";
 
 export function Footer() {
+  const pathname = usePathname();
+  const { site, disclosed } = useSettings();
+  if (pathname.startsWith("/admin")) return null;
+  const days = site?.refund_days ?? 7;
+
   return (
-    <footer className="w-full bg-slate-950 border-t border-slate-800/80 text-slate-400 pt-14 pb-8 px-6 lg:px-12 mt-10">
-      {/* Footer Top Header */}
-      <div className="max-w-[1360px] mx-auto pb-10 border-b border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <Link href="/" className="brand">
-            <span className="brand-icon shadow-md shadow-amber-500/20">
-              <Wallet size={24} />
-            </span>
-            <span>
-              money<span className="text-blue-400 font-extrabold">pay</span>
-              <small className="text-slate-400 tracking-wider">BY RAKVIH</small>
-            </span>
-          </Link>
-          <p className="mt-2 text-xs text-slate-400 max-w-md leading-relaxed font-medium">
-            Fast, transparent & encrypted application verification portal for applicants across India.
-          </p>
-        </div>
+    <footer className="relative mt-16 overflow-hidden border-t border-white/[0.06] bg-navy">
+      <div className="aurora pointer-events-none absolute inset-x-0 bottom-0 h-[360px] opacity-50 [mask-image:linear-gradient(to_top,#000_40%,transparent)]" aria-hidden />
+      <div className="divider-glow absolute inset-x-0 top-0" aria-hidden />
 
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-3.5 py-2 rounded-full text-xs font-semibold text-slate-300">
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            Verification Systems Active
-          </span>
-          <Link
-            href="/apply"
-            className="btn btn-yellow text-xs font-extrabold px-5 py-2.5 rounded-xl inline-flex items-center gap-2 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:-translate-y-0.5 transition duration-200"
-          >
-            Apply Now <ArrowRight size={15} />
+      <div className="shell relative grid grid-cols-2 gap-x-6 gap-y-10 pb-10 pt-12 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
+        <div className="col-span-2 md:col-span-1">
+          <Logo />
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
+            Money Pay is a loan application platform. We verify your application;{" "}
+            {disclosed ? <span className="text-ink-2">{site?.lender_name}</span> : "our lending partner"} makes every credit decision and disburses every loan.
+          </p>
+          <Link href="/apply" className="btn btn-gold btn-sm mt-5">
+            Start your application <ArrowUpRight size={14} />
           </Link>
+        </div>
+        <FooterCol
+          title="Platform"
+          links={[
+            ["/apply", "Apply"],
+            ["/how-it-works", "How it works"],
+            ["/questions", "FAQs"],
+          ]}
+        />
+        <FooterCol
+          title="Legal"
+          links={[
+            ["/terms", "Fees & terms"],
+            ["/privacy", "Privacy policy"],
+            ["/terms#grievance", "Grievance redressal"],
+          ]}
+        />
+        <div className="col-span-2 md:col-span-1">
+          <h3 className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-faint">Contact</h3>
+          <ul className="mt-5 space-y-3 text-sm text-ink-2">
+            {site?.support_email && (
+              <li>
+                <a className="inline-flex items-center gap-2 hover:text-ink" href={`mailto:${site.support_email}`}>
+                  <Mail size={14} className="text-gold" /> {site.support_email}
+                </a>
+              </li>
+            )}
+            {site?.support_phone && (
+              <li className="inline-flex items-center gap-2">
+                <Phone size={14} className="text-gold" /> {site.support_phone}
+              </li>
+            )}
+            {site?.grievance_officer ? (
+              <li className="well p-3.5 text-xs leading-relaxed">
+                <span className="flex items-center gap-1.5 font-semibold text-ink">
+                  <ShieldCheck size={13} className="text-gold" /> Grievance officer
+                </span>
+                <span className="mt-1 block">{site.grievance_officer}</span>
+                <a className="text-brand-ink hover:underline" href={`mailto:${site.grievance_email}`}>
+                  {site.grievance_email}
+                </a>
+              </li>
+            ) : (
+              <li className="text-muted">Contact details will appear here once published.</li>
+            )}
+            {site?.company_address && <li className="text-xs text-faint">{site.company_address}</li>}
+          </ul>
         </div>
       </div>
 
-      {/* Footer 4-Column Links Grid */}
-      <div className="max-w-[1360px] mx-auto py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 border-b border-slate-800/80 text-xs">
-        {/* Col 1: About & Security */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-extrabold text-white tracking-wide uppercase">About Money Pay</h3>
-          <p className="text-slate-400 leading-relaxed">
-            Rakvih Money Pay provides structured manual KYC document evaluation and payment reference verification for loan applicants.
-          </p>
-          <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 space-y-1.5">
-            <div className="flex items-center gap-2 font-bold text-white text-[11px]">
-              <Lock size={14} className="text-emerald-400" /> Private Encrypted Storage
-            </div>
-            <p className="text-[11px] text-slate-400 leading-snug">
-              All documents are stored encrypted in private storage buckets with temporary 5-minute admin access links.
-            </p>
-          </div>
-        </div>
-
-        {/* Col 2: Navigation Links */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-extrabold text-white tracking-wide uppercase">Portal Navigation</h3>
-          <ul className="space-y-2.5 text-slate-300 font-semibold">
-            <li>
-              <Link href="/" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> Home Portal
-              </Link>
-            </li>
-            <li>
-              <Link href="/apply" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> Application & Payment Form
-              </Link>
-            </li>
-            <li>
-              <Link href="/how-it-works" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> How Money Pay Works
-              </Link>
-            </li>
-            <li>
-              <Link href="/questions" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> FAQs & Support Center
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5 text-slate-400">
-                <span>•</span> Admin Management Panel
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Col 3: Legal & Compliance */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-extrabold text-white tracking-wide uppercase">Legal & Policies</h3>
-          <ul className="space-y-2.5 text-slate-300 font-semibold">
-            <li>
-              <Link href="/terms" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> Terms & Conditions
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5">
-                <span>•</span> Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5 text-slate-400">
-                <span>•</span> ₹299 Processing Fee Terms
-              </Link>
-            </li>
-            <li>
-              <Link href="/how-it-works" className="hover:text-blue-400 transition duration-200 flex items-center gap-1.5 text-slate-400">
-                <span>•</span> Category Document Guidelines
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Col 4: Verification Info & Support */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-extrabold text-white tracking-wide uppercase">Verification Desk</h3>
-          <div className="space-y-2 text-slate-300">
-            <div className="flex items-center gap-2">
-              <Clock size={15} className="text-amber-400 shrink-0" />
-              <span>Review Time: <strong>24–48 Hours</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
-              <span>Processing Fee: <strong>₹299 Fixed</strong></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail size={15} className="text-blue-400 shrink-0" />
-              <span>Support Email: <strong className="text-slate-200">support@rakvih.com</strong></span>
-            </div>
-          </div>
-          <Link
-            href="/apply"
-            className="mt-3 inline-block w-full text-center py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-blue-400 border border-slate-800 font-bold transition duration-200"
-          >
-            Check Application Status →
-          </Link>
-        </div>
-      </div>
-
-      {/* Footer Bottom Bar */}
-      <div className="max-w-[1360px] mx-auto pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs text-slate-500">
-        <div className="space-y-1">
-          <p className="font-semibold text-slate-400">© {new Date().getFullYear()} Money Pay by Rakvih. All rights reserved.</p>
-          <div className="flex gap-4 text-[11px] font-semibold text-slate-400">
-            <Link href="/terms" className="hover:underline">Terms of Service</Link>
-            <span>•</span>
-            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
-            <span>•</span>
-            <Link href="/questions" className="hover:underline">FAQs</Link>
-          </div>
-        </div>
-        <p className="max-w-xl text-[11px] leading-relaxed text-slate-500 bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
-          The ₹299 application processing fee is strictly non-refundable and covers manual document evaluation and administrative processing. Application acceptance confirms initial document approval; final loan terms, eligibility, and disbursement are subject to separate operator assessment.
+      {/* Disclosures — above the divider line */}
+      <div className="shell relative space-y-2.5 pb-8 text-xs leading-relaxed text-faint">
+        <p>
+          <span className="text-muted">Fee &amp; refund:</span> a one-time application fee of ₹{FEE} is charged for document and payment verification. If your application is not
+          approved, the full ₹{FEE} is refunded to your UPI ID within {days} days. The fee is not interest and is not deducted from any loan.
         </p>
+        {disclosed && site && (
+          <p>
+            <span className="text-muted">Lender:</span> {site.lender_name} ({site.lender_type}, RBI Reg. No. {site.lender_reg_no}). Loan amount, interest rate, tenure and all
+            other terms are set by the lender and shown in a Key Fact Statement before you sign any loan agreement.
+          </p>
+        )}
+      </div>
+
+      {/* Bottom bar */}
+      <div className="relative border-t border-white/[0.06]">
+        <div className="shell flex flex-col items-start gap-2 py-5 text-xs text-faint sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} {site?.company_name || "Money Pay"}. All rights reserved.
+          </p>
+          <p className="text-muted">
+            Designed and developed by{" "}
+            <a
+              href="https://www.rakvih.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-[#f5c542] transition-[color,text-shadow] duration-300 hover:text-[#ffd970] hover:[text-shadow:0_0_8px_rgb(245_197_66/0.95),0_0_20px_rgb(245_197_66/0.65),0_0_36px_rgb(245_197_66/0.4)] focus-visible:[text-shadow:0_0_8px_rgb(245_197_66/0.95),0_0_20px_rgb(245_197_66/0.65)]"
+            >
+              Rakvih
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+  return (
+    <div>
+      <h3 className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-faint">{title}</h3>
+      <ul className="mt-5 space-y-3 text-sm">
+        {links.map(([href, label]) => (
+          <li key={href}>
+            <Link href={href} className="text-ink-2 transition hover:text-ink">
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

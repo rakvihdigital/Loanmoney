@@ -1,124 +1,119 @@
-# Money Pay — Rakvih
+# Money Pay
 
-Standalone Next.js App Router + TypeScript + Tailwind CSS + Supabase project.
+Loan application platform built with Next.js (App Router) + TypeScript + Tailwind CSS v4 + Supabase.
+Applicants apply, upload KYC documents and pay a ₹299 application fee by UPI. Reviewers approve or decline
+from an admin console. Approved applications go to the disclosed lending partner. Declined applications
+with a confirmed payment are refunded.
 
-## Included
-- Redesigned cream, navy, blue and yellow layout with a custom application illustration, responsive typography, fee summary, account/payment panels and expandable FAQs.
-- Applicant email/password registration and login.
-- Fixed ₹299 application processing fee.
-- Admin uploads a QR code and publishes the payee name / UPI ID.
-- Applicant submits personal details, date of birth, residential address, loan amount, KYC documents, UTR and private payment screenshot.
-- Students upload student ID and institution details. Drivers upload their driving licence. All applicants supply identity and address proof.
-- KYC documents are private PNG/JPG/WebP/PDF files, maximum 5 MB each. Full document numbers are not collected in text fields; only the last four characters.
-- Expected review window: 24–48 hours. Admin accepts or rejects with a note.
-- Applicants see only their applications. Admin privileges enforced in PostgreSQL.
-- Admin must verify payment and KYC before acceptance. Rejection requires a reason. Private document links expire after five minutes.
-- One pending application per user; transaction references cannot be reused.
-- QR image is public; payment screenshots are private with temporary signed URLs.
-- Submission snapshots payment details for the admin audit trail.
+## Rules enforced in the database (not just the UI)
+- **Lender disclosure first.** Applications are refused until a lender name and RBI registration number are
+  published in Admin → Settings. The disclosure appears on every page and is saved with each application.
+- **Refund on decline.** Declining an application whose ₹299 payment was confirmed puts it in the refund queue.
+  It stays there, with a due date, until a refund UTR is recorded. If the payment can't be found, the applicant
+  is told why and pointed to the grievance officer.
+- Approval requires payment confirmed and KYC reviewed. Declining requires a note to the applicant.
+- One application under review per user. A UTR or payment screenshot can be used only once.
+- All writes go through validated `security definer` RPCs. Applicants can read only their own rows, KYC and documents.
+- Every step is written to `application_events` and shown as a timeline to the applicant and the admin.
 
-## Start
+## Setup
 Requires Node.js 20.9+.
 
-```powershell
-cd C:\Users\ADMIN\Desktop\Rakvih\money-pay
+```bash
 npm install
-Copy-Item .env.example .env.local
-# Fill in .env.local, then:
+cp .env.example .env.local   # URL + publishable key; service role key is server-only
 npm run dev
 ```
 
-Open http://localhost:3000. Admin dashboard: http://localhost:3000/admin.
-The public landing page previews without Supabase; submission requires configuration.
+1. Create a Supabase project and run **`supabase/schema.sql`** in the SQL Editor.
+   The file is idempotent: run it on a new project, or re-run it to upgrade an existing installation (data is kept).
+2. **Authentication → Sign In / Providers → Email → turn OFF "Confirm email".**
+   Accounts log in with **mobile number + password**. Internally each account uses a hidden
+   address like `m9876543210@phone.moneypay.invalid` (never emailed), so no SMS provider is needed.
+   The user's real email is optional and saved separately.
+3. Auth → URL Configuration: set Site URL (e.g. `http://localhost:3000`).
+4. Create your admin account on `/apply` (mobile number + password), then promote it:
+   ```sql
+   insert into public.admin_users(user_id)
+   select id from auth.users where raw_user_meta_data->>'phone' = '9876543210'
+   on conflict do nothing;
+   ```
+5. Sign in at `/admin/login` (mobile number or email), then open **Settings**:
+   - Lender legal name, type, RBI registration number, grievance officer name + email, refund window.
+   - Payee name, UPI ID and QR image for collecting the fee.
+6. The Overview tab shows a setup checklist until both are done. After that, applications are open.
 
-## Updating an existing installation
-If you already ran an earlier schema, run ONLY `supabase/migrations/002_kyc.sql`.
-It adds the private KYC table and bucket, new submission/review RPCs and disables the
-old RPCs so clients cannot bypass document requirements. Existing records are preserved.
-Earlier pending applications without KYC cannot be accepted; reject with an explanation
-and ask the applicant to submit a new application with the required documents.
+### Upgrading from the previous version
+Re-run `supabase/schema.sql`. It drops the old `submit_application*` / `review_application*` RPCs, adds the refund,
+timeline and settings tables, backfills reference codes and timeline events, and moves previously declined applications
+with a confirmed payment into the refund queue. Applications submitted before this version have no refund UPI ID; refund
+them to the account that paid (the UTR is shown).
 
-Fresh projects: run the complete `supabase/schema.sql` below; it includes the migration.
+## Pages
+| Route | What it is |
+|---|---|
+| `/` | Landing page |
+| `/login` | Login hub, all by **mobile number + password**: **My loan** (approved borrowers, admin-generated password) and **Track application** (applicants) |
+| `/borrower` | Borrower dashboard: loan amount, EMI, rate, tenure, next EMI, repayment schedule (CSV), lender, history |
+| `/apply` | Sign up / sign in, 4-step application wizard, application timeline & refund status |
+| `/admin/login` | Admin sign-in (admins only; no sign-up). `/admin` redirects here when signed out |
+| `/admin` | Admin console: overview, review queue + review drawer, refunds, settings |
+| `/how-it-works`, `/questions`, `/terms`, `/privacy` | Content and legal pages (read lender and refund details live from settings) |
+| `/account/reset` | Password reset landing page |
 
-## Supabase setup
-1. Create a Supabase project.
-2. Run the complete `supabase/schema.sql` file ONCE in its SQL Editor (new project).
-3. Copy the project URL and publishable key into `.env.local`.
-   Do not put a service-role or secret key in a NEXT_PUBLIC variable.
-4. Configure Auth > URL Configuration: Site URL = http://localhost:3000 for local use.
-   Add your deployed URL before going live. Email confirmation is supported:
-   users confirm their email and then sign in with their password.
-5. Register the admin using the public registration form and confirm their email.
-6. Promote ONLY your administrator by running this in Supabase SQL Editor:
+## Code map
+- `supabase/schema.sql` — tables, RLS, storage buckets/policies, RPCs
+- `src/lib/settings-context.tsx` — public lender + payment settings shared by every page
+- `src/lib/application-validation.ts` — client validation mirroring the `submit_loan_application` RPC
+- `src/components/apply/*` — wizard, application card + timeline, portal
+- `src/components/admin/*` — console shell, overview, applications table, review drawer, refunds, settings
+- `src/app/globals.css` — design tokens (`@theme`) and component classes
 
-```sql
-insert into public.admin_users(user_id)
-select id from auth.users where email = 'YOUR_ADMIN_EMAIL'
-on conflict do nothing;
+## Checks
+```bash
+npm run typecheck
+npm test          # validation unit tests (Node 22.6+ / 24)
+npm run build
 ```
 
-7. Sign in at /admin. Add the payee name, UPI ID, and PNG/JPG/WebP QR image (max 2 MB).
-8. Users pay exactly ₹299 in their UPI app, enter the transaction reference, and upload
-   a payment screenshot (max 5 MB). Admin checks the receiving account and reviews.
-9. Admin decisions appear when applicants return to the page or press Refresh.
+## Environment variables
+| Variable | Where | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | browser + server | Project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | browser + server | Public key (RLS applies) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **server only** | Signs 2-minute download links for borrower documents (`/api/borrower/document`). Never prefix with `NEXT_PUBLIC_`. On Vercel, add it as a normal (non-public) env var. |
 
-## Validation
-`npm run typecheck` and `npm run build`.
+## Borrower login (approved loans)
+1. Admin → Applications → open an **approved** application → **Loan & borrower login**.
+2. Enter the loan details from the lender (account no., amount, rate, tenure, dates, status). The EMI is calculated automatically.
+3. Click **Generate password**. Share the password with the borrower; they log in with the **mobile number on their application**.
+   The password is shown only once; only a bcrypt hash is stored. **Regenerate** creates a new one and signs out old sessions.
+4. The borrower logs in at `/login` → **My loan** (mobile number + password).
 
-## Manual acceptance checks with a configured Supabase project
-- Confirm a normal applicant cannot access the admin dashboard or call the review RPC.
-- Publish a QR as admin; verify it appears on the applicant page.
-- Submit an application with a valid screenshot and transaction reference.
-- Confirm another applicant cannot read its record or private screenshot.
-- Confirm duplicate transaction references and a second pending application are rejected.
-- Verify Accept is blocked unless payment receipt is checked; reject requires a reason.
-- Accept/reject as admin; applicant sees the decision and note on refresh.
-- Confirm payment configuration changes during submission cause a reload error.
+The borrower portal (`/borrower`) has five tabs: **Overview** (next EMI, progress, outstanding),
+**Repayments** (how to pay + schedule with Paid / Overdue / Due / Upcoming), **Documents** (KFS, sanction letter,
+agreement, NOC), **Loan details** (disbursement, charges, lender) and **Account** (profile, change password, help).
 
-## KYC validation checks
-Run with Node.js 24:
-`node --experimental-strip-types --test tests/kyc-validation.test.mjs`
+Admin keeps it up to date from the same review panel, which has four tabs:
+- **Loan**: amount, rate, tenure, dates, disbursement, charges, and *how to pay* (lender's method / https link / instructions).
+- **EMIs**: mark each instalment paid (date, amount, reference) once the lender confirms it; undo if needed.
+- **Documents**: upload PDFs/images (≤10 MB) to the private `loan-documents` bucket; upload the KFS first.
+- **Login**: generate / regenerate the borrower password. Sessions last 12 hours; 5 wrong attempts lock the login for 15 minutes.
 
-Verified locally: six validation tests and production build.
-Not verified live: Supabase migrations, RLS, actual storage uploads and RPC decisions
-because no project credentials are configured.
-
-With your configured Supabase project, also verify:
-- Student submission without a student ID is rejected.
-- Driver submission with an identity type other than driving licence is rejected.
-- Identity and address proofs must belong to the signed-in applicant.
-- Another applicant cannot query KYC details or obtain document signed URLs.
-- Legacy submission/review RPCs are unavailable to authenticated and anonymous users.
-- Admin acceptance fails without both payment and KYC confirmations.
-- Old applications missing KYC cannot be accepted.
-- Consent and applicant/KYC data are written atomically by the new submission RPC.
+## Reset an applicant's password
+Mobile-number accounts can't receive reset emails. Reset one in Supabase → SQL Editor:
+```sql
+update auth.users
+   set encrypted_password = extensions.crypt('NewPassword123', extensions.gen_salt('bf'))
+ where raw_user_meta_data->>'phone' = '9876543210';
+```
+Then tell the applicant the new password and ask them to keep it private.
 
 ## Operational notes
-This is manual UPI verification, not a payment gateway. A screenshot or UTR alone does
-not prove payment. Check the actual receiving account. QR uploads do not generate or
-validate QR payment content: upload the genuine recipient QR and matching UPI details.
-Review time is an estimate; there is no automatic acceptance or automatic loan payout.
-Refund handling, lender disclosures, loan terms, and support contact should be finalized
-by the operator before collecting real payments. The reference's five-minute promise
-and guaranteed/no-score loan claims are not used.
-
-No production Supabase account or credentials are bundled. Auth and RLS need the above setup.
-Unused KYC and proof uploads from failed submissions may remain in storage; clean these up periodically
-with a trusted admin maintenance job, retaining submitted proofs according to your retention policy.
-
-## Main files
-- `src/components/landing.tsx`: redesigned landing sections, application preview and FAQs
-- `src/components/money-pay.tsx`: frontend, applicant flow and admin dashboard
-- `src/app/page.tsx`: public page
-- `src/app/admin/page.tsx`: admin page
-- `src/lib/supabase.ts`: browser client (publishable key + RLS)
-- `src/app/globals.css`: Tailwind + shared styling
-- `supabase/schema.sql`: tables, policies, buckets and secure RPCs
-
-Documentation used:
-- https://nextjs.org/docs/app/getting-started/installation
-- https://tailwindcss.com/docs/installation/framework-guides/nextjs
-- https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
-
-
-KYC collection supports manual document review. It does not perform government verification or certify regulatory KYC compliance. The operator must define appropriate document, privacy and retention requirements before collecting real records.
+- This is manual UPI verification, not a payment gateway. A screenshot or UTR alone doesn't prove payment.
+  Always check the receiving account before choosing "payment found".
+- Refunds are sent manually from your UPI/bank app; record the refund UTR in Admin → Refunds.
+- Collect fees into a business account in the company's name, and make sure the published lender details are
+  accurate and that your arrangement with the lender permits this fee. These are your responsibility as operator.
+- KYC review here is manual document checking. It isn't government verification.
+- Files from abandoned submissions can stay in storage. Clean them up periodically according to your retention policy.
